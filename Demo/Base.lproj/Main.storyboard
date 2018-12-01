@@ -24,11 +24,21 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wnB-kX-Ud7">
+                                <rect key="frame" x="60" y="318.5" width="255" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="43O-a4-tZO" secondAttribute="bottom" constant="220" id="Aeb-mR-khV"/>
+                            <constraint firstItem="wnB-kX-Ud7" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="E12-YP-Sd4"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="wnB-kX-Ud7" secondAttribute="trailing" constant="60" id="EJP-0l-MsS"/>
+                            <constraint firstItem="wnB-kX-Ud7" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="KuG-rZ-ZQo"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="43O-a4-tZO" secondAttribute="trailing" constant="60" id="dKJ-ca-yVT"/>
+                            <constraint firstItem="wnB-kX-Ud7" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="60" id="etl-sr-8Ub"/>
                             <constraint firstItem="43O-a4-tZO" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="60" id="qkL-wg-fOd"/>
                             <constraint firstItem="43O-a4-tZO" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="weY-gK-B6p"/>
                         </constraints>

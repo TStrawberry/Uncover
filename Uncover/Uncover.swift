@@ -15,8 +15,8 @@ public enum Movement {
     
     public var numerical: CGFloat {
         switch self {
-        case let .up(value): return -value
-        case let .down(value): return value
+        case let .up(value) where value != 0: return -value
+        case let .down(value) where value != 0: return value
         default: return 0
         }
     }
@@ -40,6 +40,7 @@ public protocol FocusItemUncoverProtocol : NSObjectProtocol {
 public extension FocusItemUncoverProtocol {
     
     func initialUncover() {
+        
         NotificationCenter.default
             .addObserver(
                 forName: UIResponder.keyboardWillChangeFrameNotification,
@@ -49,6 +50,27 @@ public extension FocusItemUncoverProtocol {
                 self?.keyBoardFrameWillChange(userInfo: userInfo)
             }
         }
+        
+        NotificationCenter.default
+            .addObserver(
+                forName: UIResponder.keyboardWillShowNotification,
+                object: nil,
+                queue: nil) { [weak self] (notification) in
+                    if let userInfo = notification.userInfo {
+                        self?.keyboardWillShow(userInfo: userInfo)
+                    }
+        }
+        
+        NotificationCenter.default
+            .addObserver(
+                forName: UIResponder.keyboardWillHideNotification,
+                object: nil,
+                queue: nil) { [weak self] (notification) in
+                    if let userInfo = notification.userInfo {
+                        self?.keyboardWillHide(userInfo: userInfo)
+                    }
+        }
+        
     }
     
     func disposeUncover() {
@@ -80,31 +102,48 @@ struct KeyBoardUserInfo {
 
 }
 
+var contexts: [Int: CGRect] = [:]
+
 
 extension FocusItemUncoverProtocol {
     
-    func keyBoardFrameWillChange(userInfo: [AnyHashable: Any]?) {
-        
-        guard let `userInfo` = userInfo, let currentResponder = UIResponder.currentFirstResponder() else { return }
+    func keyBoardFrameWillChange(userInfo: [AnyHashable: Any]) {
+        print(#function)
+        guard let currentResponder = UIResponder.currentFirstResponder() else { return }
         
         let keyBoardUserInfo = KeyBoardUserInfo(userInfo)
         let endFrame = keyBoardUserInfo.endFrame
         
         let focusItem = uncoverItem(for: currentResponder)
-        let screenOrientedFrame = focusItem.convert(focusItem.frame, to: UIScreen.main.fixedCoordinateSpace)
         
-        print(UIScreen.main.bounds)
-        print(endFrame)
-        print(screenOrientedFrame)
+        let screenOrientedFrame = focusItem.convert(CGRect(origin: .zero, size: focusItem.frame.size), to: UIScreen.main.coordinateSpace)
         
         let distance = screenOrientedFrame.maxY - endFrame.minY
-        let movement: Movement = distance > 0 ? .up(distance) : .none
+        let movement: Movement = distance > 0 ? .up(distance) : {
+            if let origin = contexts[focusItem.hash] {
+                let originOrientedDistance = screenOrientedFrame.maxY - origin.maxY
+                return originOrientedDistance > 0 ? Movement.up(originOrientedDistance) : Movement.down(-originOrientedDistance)
+            }
+            return Movement.none
+            }()
         
         move(focusItem, by: movement)
+        
+        if contexts.keys.contains(focusItem.hash) == false {
+            contexts[focusItem.hash] = screenOrientedFrame
+        }
+        
+    }
+    
+    func keyboardWillShow(userInfo: [AnyHashable: Any]) {
+        print(#function)
+    }
+    
+    func keyboardWillHide(userInfo: [AnyHashable: Any]) {
+        print(#function)
     }
     
 }
-
 
 
 
@@ -115,12 +154,14 @@ extension UIResponder {
     fileprivate class func currentFirstResponder() -> UIResponder? {
         UIResponder._currentFirstResponder = nil
         let selector = #selector(UIResponder.findFirstResponder(sender:))
-        UIApplication.shared.sendAction(selector, to: nil, from: nil, for: nil)
+        UIApplication.shared
+            .sendAction(selector, to: nil, from: nil, for: nil)
         return UIResponder._currentFirstResponder
     }
     
     @objc internal func findFirstResponder(sender: AnyObject) {
         UIResponder._currentFirstResponder = self
     }
+    
 }
 
